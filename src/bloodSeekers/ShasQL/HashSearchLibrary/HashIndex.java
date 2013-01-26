@@ -1,4 +1,4 @@
-package bloodSeekers.ShasQL.HashSearch;
+package bloodSeekers.ShasQL.HashSearchLibrary;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,7 +14,7 @@ import bloodSeekers.ShasQL.FileManager.FileManager;
 import bloodSeekers.ShasQL.Hasher.Hasher;
 import bloodSeekers.ShasQL.Utilities.TrimLibrary;
 
-public class HashSearch {
+public class HashIndex {
 	public static void main(String[] args) {
 		Scanner sc;
 		FileManager.CreateFolders();
