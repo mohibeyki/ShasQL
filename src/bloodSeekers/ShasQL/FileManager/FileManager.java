@@ -7,6 +7,13 @@ public class FileManager {
 
 	public static final int BLOCK_SIZE = 4 * 1024;
 
+	public static void CreateFolders() {
+		for (int i = -99; i < 100; ++i) {
+			File file = new File("hashFiles/" + Integer.toString(i));
+			file.mkdirs();
+		}
+	}
+	
 	public static long Partition(File file) {
 		return file.length() / BLOCK_SIZE;
 	}
