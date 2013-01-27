@@ -2,9 +2,11 @@ package bloodSeekers.ShasQL.BPTree;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 
@@ -43,19 +45,30 @@ public class Main {
 	}
 
 	public static void main(String[] args) throws Exception {
-		int n = 10000;
+		int n = 100;
 		count = 1;
 
-		// System.out.println(BPNode.Root());
-		// BPNode.Root().printSorted();
+		File db = new File("db.ShasQL");
+		if (db.exists()) {
 
-		for (int i = 0; i < n; i++) {
-			int k = (int) (Math.random() * 10000);
-			Root().add(k);
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(
+					"db.ShasQL"));
+			root = (BPNode) ois.readObject();
+			ois.close();
+			leafRAF = new RandomAccessFile(new File("Leaves"), "rw");
+			Root().printSorted();
 		}
-		ObjectOutputStream ow = new ObjectOutputStream(new FileOutputStream(
-				"db.ShasQL"));
-		ow.writeObject(root);
-		ow.close();
+		else {
+			for (int i = 0; i < n; i++) {
+				int k = (int) (Math.random() * 10000);
+				Root().add(k);
+			}
+			Root().printSorted();
+			System.out.println();
+			ObjectOutputStream ow = new ObjectOutputStream(
+					new FileOutputStream("db.ShasQL"));
+			ow.writeObject(root);
+			ow.close();
+		}
 	}
 }

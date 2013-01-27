@@ -25,36 +25,38 @@ public class BPLeaf extends BPNode {
 	public byte[] cluster;
 	public int size;
 
-	public void add(int i, BPNode parent) {
+	public int add(int i, BPNode parent) {
 		try {
-			BPNode.leafRAF.seek(index * MAXN);
+			Main.leafRAF.seek(index * MAXN);
 			this.size = readSize();
 			if (size < 0)
 				size = 0;
 			if (size > 0)
-				BPNode.leafRAF.read(cluster, 0, size);
+				Main.leafRAF.read(cluster, 0, size);
 		} catch (IOException e) {
 			e.printStackTrace();
+			return -1;
 		}
 		this.parent = parent;
 		createValueList();
-		addNode(i);
+		int u =addNode(i);
 		value = new ArrayList<Integer>();
 		cluster = new byte[MAXN];
 		size = 0;
+		return u;
 	}
 
 	public int readSize() throws IOException {
-		byte tmp = (byte) BPNode.leafRAF.read();
+		byte tmp = (byte) Main.leafRAF.read();
 		int u = 0;
 		u = (tmp < 0 ? tmp + 256 : tmp);
-		tmp = (byte) BPNode.leafRAF.read();
+		tmp = (byte) Main.leafRAF.read();
 		int k = (tmp < 0 ? tmp + 256 : tmp);
 		u = u * 256 + k;
-		tmp = (byte) BPNode.leafRAF.read();
+		tmp = (byte) Main.leafRAF.read();
 		k = (tmp < 0 ? tmp + 256 : tmp);
 		u = u * 256 + k;
-		tmp = (byte) BPNode.leafRAF.read();
+		tmp = (byte) Main.leafRAF.read();
 		k = (tmp < 0 ? tmp + 256 : tmp);
 		u = u * 256 + k;
 		return u;
@@ -79,9 +81,9 @@ public class BPLeaf extends BPNode {
 		for (int i = 0; i < value.size(); i++)
 			addToCluster(value.get(i));
 		try {
-			BPNode.leafRAF.seek(this.index * MAXN);
-			BPNode.leafRAF.write(getSizeByte());
-			BPNode.leafRAF.write(cluster);
+			Main.leafRAF.seek(this.index * MAXN);
+			Main.leafRAF.write(getSizeByte());
+			Main.leafRAF.write(cluster);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -112,12 +114,11 @@ public class BPLeaf extends BPNode {
 	}
 
 	public void printSorted() {
-		System.out.println("INDEX " + index);
 		try {
-			BPNode.leafRAF.seek(index * MAXN);
+			Main.leafRAF.seek(index * MAXN);
 			this.size = readSize();
 			if (size > 0)
-				BPNode.leafRAF.read(cluster, 0, size);
+				Main.leafRAF.read(cluster, 0, size);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -139,10 +140,10 @@ public class BPLeaf extends BPNode {
 	public String toString() {
 		String tmp = "";
 		try {
-			BPNode.leafRAF.seek(index * MAXN);
+			Main.leafRAF.seek(index * MAXN);
 			this.size = readSize();
 			if (size > 0)
-				BPNode.leafRAF.read(cluster, 0, size);
+				Main.leafRAF.read(cluster, 0, size);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -180,7 +181,13 @@ public class BPLeaf extends BPNode {
 			return s;
 	}
 
-	public void addNode(int v) {
+	public int addNode(int v) {
+		
+		for(int i=0; i< value.size(); i++)
+		{
+			if( value.get(i) == v)
+				return v;
+		}
 		if (value.size() >= NODESIZE)
 			split(v);
 		else {
@@ -193,12 +200,14 @@ public class BPLeaf extends BPNode {
 				// info.add(place, v);
 			}
 			createClusterString();
+			return v;
 		}
+		return -1;
 	}
 
 	public void split(int v) {
 		incName();
-		BPLeaf tmp = new BPLeaf(partitionIndex);
+		BPLeaf tmp = new BPLeaf(Main.partitionIndex);
 		int m = value.get(NODESIZE / 2);
 		tmp.value.addAll(value.subList(0, NODESIZE / 2));
 		// tmp.info.addAll(info.subList(0, NODESIZE / 2));
@@ -224,7 +233,7 @@ public class BPLeaf extends BPNode {
 			parent.value.add(m);
 			parent.children.add(tmp);
 			parent.children.add(this);
-			root = parent;
+			Main.root = parent;
 			Main.count++;
 		} else {
 			tmp.parent = parent;

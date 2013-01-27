@@ -41,8 +41,6 @@ public class BPNode implements Serializable {
 
 	public void printSorted() {
 		for (int i = 0; i < children.size(); i++) {
-			System.out.println("SD "
-					+ Boolean.toString(children.get(i) instanceof BPLeaf));
 			children.get(i).printSorted();
 		}
 	}
@@ -53,21 +51,21 @@ public class BPNode implements Serializable {
 		return this;
 	}
 
-	public void add(int i) throws Exception {
+	public int add(int i) throws Exception {
 		BPNode tmp = binarySearch(i);
 		if (tmp == null)
 			throw new Exception(
 					"Something went wrong @ add, Binary search has a problem!");
-		tmp.add(i, this);
+		return tmp.add(i, this);
 	}
 
-	public void add(int i, BPNode parent) throws Exception {
+	public int add(int i, BPNode parent) throws Exception {
 		BPNode tmp = binarySearch(i);
 		if (tmp == null)
 			throw new Exception(
 					"Something went wrong @ add, Binary search has a problem!");
 		this.parent = parent;
-		tmp.add(i, this);
+		return tmp.add(i, this);
 	}
 
 	public int binarySearchPlace(int v) {
@@ -129,8 +127,8 @@ public class BPNode implements Serializable {
 				Main.NODESIZE / 2 + 1));
 		for (int i = 0; i < tmp.children.size(); i++)
 			tmp.children.get(i).parent = tmp;
-		this.value = new ArrayList<Integer>(value.subList(Main.NODESIZE / 2 + 1,
-				value.size()));
+		this.value = new ArrayList<Integer>(value.subList(
+				Main.NODESIZE / 2 + 1, value.size()));
 		this.children = new ArrayList<BPNode>(this.children.subList(
 				Main.NODESIZE / 2 + 1, children.size()));
 		if (v < m)
