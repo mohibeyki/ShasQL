@@ -2,13 +2,9 @@ package bloodSeekers.ShasQL.BPTree;
 
 import java.util.*;
 
-import com.google.gson.annotations.Expose;
-
 public class BPLeaf extends BPNode {
 
-	@Expose
 	private static final long serialVersionUID = 1179730276595841822L;
-	@Expose
 	ArrayList<Integer> info;
 
 	@Override

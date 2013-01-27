@@ -2,14 +2,10 @@ package bloodSeekers.ShasQL.BPTree;
 
 import java.io.*;
 import java.util.*;
-import com.google.gson.*;
-import com.google.gson.annotations.*;
 
 public class BPNode implements Serializable {
 
-	@Expose
 	private static final long serialVersionUID = -5002211178486941590L;
-	@Expose
 	protected static BPNode root;
 
 	@Override
@@ -45,46 +41,14 @@ public class BPNode implements Serializable {
 		}
 	}
 
-	public void SaveJSon() {
-		try {
-			Gson gson = new GsonBuilder()
-					.excludeFieldsWithoutExposeAnnotation().create();
-			FileWriter fileWriter = new FileWriter(new File("JSon"));
-			fileWriter.write(gson.toJson(root));
-			fileWriter.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void LoadJSon() {
-		Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation()
-				.create();
-		try {
-			Scanner sc = new Scanner(new FileInputStream("JSon"));
-			root = gson.fromJson(sc.nextLine(), BPNode.class);
-			System.out.println(root.value.size());
-			System.out.println(root.value);
-			System.out.println(root.toString());
-			sc.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-
-	@Expose
 	static final int NODESIZE = 8;
 
 	protected BPNode parent;
 
-	@Expose
 	protected ArrayList<BPNode> children;
-	@Expose
 	protected ArrayList<Integer> value;
 
-	@Expose
 	public int size;
-	@Expose
 	public ArrayList<Byte> sector;
 
 	public static BPNode Root() {

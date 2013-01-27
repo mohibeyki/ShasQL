@@ -10,10 +10,11 @@ public class FileManager {
 	public static void CreateFolders() {
 		for (int i = -99; i < 100; ++i) {
 			File file = new File("hashFiles/" + Integer.toString(i));
-			file.mkdirs();
+			if (!file.exists())
+				file.mkdirs();
 		}
 	}
-	
+
 	public static long Partition(File file) {
 		return file.length() / BLOCK_SIZE;
 	}
