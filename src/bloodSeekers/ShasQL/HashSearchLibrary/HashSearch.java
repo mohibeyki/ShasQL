@@ -14,6 +14,12 @@ public class HashSearch {
 	public static void main(String[] args) throws FileNotFoundException {
 		Scanner sc = new Scanner(System.in);
 		String key = sc.next();
+		FindWord(sc, key);
+		sc.close();
+	}
+
+	private static void FindWord(Scanner sc, String key)
+			throws FileNotFoundException {
 		int hashCode = Hasher.getHashCode(key);
 		System.out.println(Hasher.getHashCode(key));
 		File file = new File("hashFiles/" + Hasher.getParentDirectory(hashCode)
@@ -36,17 +42,19 @@ public class HashSearch {
 					System.out.println("Part : " + part);
 					raf.seek(part * FileManager.BLOCK_SIZE);
 					raf.read(b);
-					String s = new String(b);
-					int index = s.toLowerCase().indexOf(key.toLowerCase());
-					if (index != -1) {
+					String s = new String(b).toLowerCase();
+					int index = s.indexOf(key.toLowerCase());
+					while (index != -1) {
 						System.out.println("Found it in file : " + fileName
 								+ " @ "
 								+ (FileManager.BLOCK_SIZE * part + index));
-						System.out.println(s.substring(
-								index,
-								index
-										+ Math.min(100, FileManager.BLOCK_SIZE
-												* 2 - index)));
+						System.out.println(s.substring((index < 30 ? 0
+								: index - 30), Math.min(index + 40,
+								FileManager.BLOCK_SIZE * 2)));
+						index = s.indexOf(key.toLowerCase(), index + 1);
+						if (index != -1)
+							System.out
+									.println("There was another one in this sector!");
 					}
 				}
 				raf.close();
@@ -55,6 +63,5 @@ public class HashSearch {
 			}
 		}
 		fileReader.close();
-		sc.close();
 	}
 }
