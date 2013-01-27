@@ -6,11 +6,21 @@ import java.io.*;
 
 public class BufferedFileOperator {
 
+	private static BufferedFileOperator instance;
 	private HashMap<String, Queue<Character>> fileBuffers;
 	private Queue<Character> readBuffer;
 	private String outputBuffer;
 	private FileReader fileInputStream;
 	private boolean EOF;
+
+	private BufferedFileOperator() {
+	}
+
+	public static BufferedFileOperator getInstance() {
+		if (instance == null)
+			instance = new BufferedFileOperator();
+		return instance;
+	}
 
 	public boolean openFile(String fileName) {
 		if (fileBuffers.get(fileName) != null
@@ -39,7 +49,7 @@ public class BufferedFileOperator {
 				randomAccessFile.seek(randomAccessFile.length());
 				randomAccessFile.writeBytes(buf);
 				randomAccessFile.close();
-					
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

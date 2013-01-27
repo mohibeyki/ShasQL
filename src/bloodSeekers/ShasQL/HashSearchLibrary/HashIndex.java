@@ -16,36 +16,38 @@ import bloodSeekers.ShasQL.Utilities.TrimLibrary;
 
 public class HashIndex {
 	public static void main(String[] args) {
-		Scanner sc;
 		FileManager.CreateFolders();
 		ArrayList<File> files = FileManager.ListAllFiles(new File("root"));
 		for (File file : files) {
-			try {
-				int totalChars = 0;
-				sc = new Scanner(file);
-				HashMap<Integer, TreeSet<Integer>> sectors = new HashMap<Integer, TreeSet<Integer>>();
-				while (sc.hasNext()) {
-					String line = sc.next();
-					ArrayList<String> formatedWords = TrimLibrary
-							.TrimAndFormat(line);
-					for (String s : formatedWords) {
-						int hashCode = Hasher.getHashCode(s);
-						if (!sectors.containsKey(hashCode))
-							sectors.put(hashCode, new TreeSet<Integer>());
-						sectors.get(hashCode).add(
-								totalChars / FileManager.BLOCK_SIZE);
-						totalChars += s.length() + 1;
-					}
+			IndexFile(file);
+		}
+	}
+
+	private static void IndexFile(File file) {
+		Scanner sc;
+		try {
+			int totalChars = 0;
+			sc = new Scanner(file);
+			HashMap<Integer, TreeSet<Integer>> sectors = new HashMap<Integer, TreeSet<Integer>>();
+			while (sc.hasNext()) {
+				
+				String line = sc.next();
+				ArrayList<String> formatedWords = TrimLibrary
+						.TrimAndFormat(line);
+				for (String s : formatedWords) {
+					int hashCode = Hasher.getHashCode(s);
+					if (!sectors.containsKey(hashCode))
+						sectors.put(hashCode, new TreeSet<Integer>());
+					sectors.get(hashCode).add(
+							totalChars / FileManager.BLOCK_SIZE);
+					totalChars += s.length() + 1;
 				}
-				try {
-					WriteInfo(file, sectors);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				sc.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
+				
+				WriteInfo(file, sectors);
 			}
+			sc.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
