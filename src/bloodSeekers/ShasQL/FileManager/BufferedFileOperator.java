@@ -106,31 +106,6 @@ public class BufferedFileOperator {
 
 	public String nextLine() throws IOException {
 		return br.readLine();
-/*		outputBuffer = "";
-		if (EOF)
-			return "";
-		while (true) {
-			while (EOF || readBuffer.size() > 0) {
-				if (readBuffer.size() == 0)
-					return outputBuffer;
-				char c = readBuffer.poll();
-				if (!EOF && c != '\n')
-					outputBuffer += c;
-				else
-					return outputBuffer;
-			}
-			char[] buf = new char[FileManager.BLOCK_SIZE];
-			int size;
-			try {
-				size = fileInputStream.read(buf);
-				if (size < 0)
-					EOF = true;
-				for (int i = 0; i < size; ++i)
-					readBuffer.add(buf[i]);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}*/
 	}
 
 	public void flushAll() {

@@ -18,8 +18,6 @@ public class HashIndex {
 	public static void main(String[] args) throws Exception {
 		FileManager.CreateFolders();
 		ArrayList<File> files = FileManager.ListAllFiles(new File("root"));
-		// BufferedFileOperator bufferedFileOperator = BufferedFileOperator
-		// .getInstance();
 		for (File file : files) {
 			FileReader fr = new FileReader(file);
 			long totalChars = 0;
@@ -37,34 +35,10 @@ public class HashIndex {
 							(int) (totalChars / FileManager.BLOCK_SIZE));
 					totalChars += s.length() + 1;
 				}
-				// System.out.println(totalChars / FileManager.BLOCK_SIZE); //
 				WriteInfo(file, sectors);
-				sectors.clear();// bufferedFileOperator.flushAll();
-
+				sectors.clear();
 			}
 			fr.close();
-			// try {
-			// int totalChars = 0;
-			// bufferedFileOperator.open(file);
-			// long i = 0;
-			// while (bufferedFileOperator.hasNext()) {
-			// System.out.println(++i);
-			// bufferedFileOperator.nextLine();
-			// }
-			/*
-			 * HashMap<Integer, TreeSet<Integer>> sectors = new HashMap<Integer,
-			 * TreeSet<Integer>>(); while (bufferedFileOperator.hasNext()) {
-			 * String line = bufferedFileOperator.next(); ArrayList<String>
-			 * formatedWords = TrimLibrary .TrimAndFormat(line); for (String s :
-			 * formatedWords) { int hashCode = Hasher.getHashCode(s); if
-			 * (!sectors.containsKey(hashCode)) sectors.put(hashCode, new
-			 * TreeSet<Integer>()); sectors.get(hashCode).add( totalChars /
-			 * FileManager.BLOCK_SIZE); totalChars += s.length() + 1; } }
-			 * System.out.println(totalChars / FileManager.BLOCK_SIZE); //
-			 * WriteInfo(file, sectors); sectors.clear(); } catch (Exception e)
-			 * { e.printStackTrace(); } // bufferedFileOperator.flushAll();
-			 */
-			// bufferedFileOperator.close();
 		}
 	}
 

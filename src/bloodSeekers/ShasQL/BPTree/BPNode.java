@@ -1,67 +1,30 @@
 package bloodSeekers.ShasQL.BPTree;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
 
 public class BPNode implements Serializable {
 
-	private static final long serialVersionUID = -5002211178486941590L;
-	protected static BPNode root;
+	private static final long serialVersionUID = -8635151291066995914L;
 
-	@Override
+	public ArrayList<BPNode> children;
+	public ArrayList<Integer> value;
+	public BPNode parent;
+
+	public static void incName() {
+		Main.partitionIndex++;
+	}
+
 	public String toString() {
-
-		String string = "{";
-		for (int i = 0; i < this.children.size() - 1; ++i)
-			string += this.children.get(i).toString() + ",";
-
-		string += this.children.size() > 0 ? this.children.get(
-				this.children.size() - 1).toString() : " " + "}";
-		return string;
+		String tmp = "";
+		for (int i = 0; i < value.size(); ++i)
+			tmp += value.get(i) + " " + children.get(i).toString();
+		return tmp;
 	}
 
-	public void SerilizeMe() {
-		try {
-			ObjectOutput OO = new ObjectOutputStream(new FileOutputStream(
-					new File("db.ShasQL")));
-			OO.writeObject(root);
-			OO.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void Hibernate() {
-		try {
-			FileWriter fileWriter = new FileWriter(new File("Hibernation"));
-			fileWriter.write(root.toString());
-			fileWriter.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	static final int NODESIZE = 8;
-
-	protected BPNode parent;
-
-	protected ArrayList<BPNode> children;
-	protected ArrayList<Integer> value;
-
-	public int size;
-	public ArrayList<Byte> sector;
-
-	public static BPNode Root() {
-		if (root == null)
-			root = new BPLeaf();
-		return root;
-	}
-
-	protected BPNode() {
+	public BPNode() {
 		children = new ArrayList<BPNode>();
 		value = new ArrayList<Integer>();
-		sector = new ArrayList<Byte>();
-
 	}
 
 	public void print() {
@@ -76,9 +39,12 @@ public class BPNode implements Serializable {
 			children.get(i).print();
 	}
 
-	public void printsorted() {
-		for (int i = 0; i < children.size(); i++)
-			children.get(i).printsorted();
+	public void printSorted() {
+		for (int i = 0; i < children.size(); i++) {
+			System.out.println("SD "
+					+ Boolean.toString(children.get(i) instanceof BPLeaf));
+			children.get(i).printSorted();
+		}
 	}
 
 	public BPNode getParent() {
@@ -87,14 +53,24 @@ public class BPNode implements Serializable {
 		return this;
 	}
 
-	public void add(int v) {
-		BPNode tmp = binarySearch(v);
+	public void add(int i) throws Exception {
+		BPNode tmp = binarySearch(i);
 		if (tmp == null)
-			System.err.println("Runtime failure");
-		tmp.add(v);
+			throw new Exception(
+					"Something went wrong @ add, Binary search has a problem!");
+		tmp.add(i, this);
 	}
 
-	protected int binarySearchPlace(int v) {
+	public void add(int i, BPNode parent) throws Exception {
+		BPNode tmp = binarySearch(i);
+		if (tmp == null)
+			throw new Exception(
+					"Something went wrong @ add, Binary search has a problem!");
+		this.parent = parent;
+		tmp.add(i, this);
+	}
+
+	public int binarySearchPlace(int v) {
 		int s = 0;
 		int e = value.size();
 		while (e - s > 1) {
@@ -122,14 +98,14 @@ public class BPNode implements Serializable {
 			else
 				e = m;
 		}
-		if (v < value.get(s))
+		if (value.size() == 0 || v < value.get(s))
 			return children.get(s);
 		else
 			return children.get(s + 1);
 	}
 
-	protected void addNode(int v, BPNode node) {
-		if (value.size() >= NODESIZE)
+	public void addNode(int v, BPNode node) {
+		if (value.size() >= Main.NODESIZE)
 			split(v, node);
 		else {
 			int place = binarySearchPlace(v);
@@ -145,18 +121,18 @@ public class BPNode implements Serializable {
 		}
 	}
 
-	private void split(int v, BPNode node) {
+	public void split(int v, BPNode node) {
 		BPNode tmp = new BPNode();
-		int m = value.get(NODESIZE / 2);
-		tmp.value = new ArrayList<Integer>(value.subList(0, NODESIZE / 2));
+		int m = value.get(Main.NODESIZE / 2);
+		tmp.value = new ArrayList<Integer>(value.subList(0, Main.NODESIZE / 2));
 		tmp.children = new ArrayList<BPNode>(this.children.subList(0,
-				NODESIZE / 2 + 1));
+				Main.NODESIZE / 2 + 1));
 		for (int i = 0; i < tmp.children.size(); i++)
 			tmp.children.get(i).parent = tmp;
-		this.value = new ArrayList<Integer>(value.subList(NODESIZE / 2 + 1,
+		this.value = new ArrayList<Integer>(value.subList(Main.NODESIZE / 2 + 1,
 				value.size()));
 		this.children = new ArrayList<BPNode>(this.children.subList(
-				NODESIZE / 2 + 1, children.size()));
+				Main.NODESIZE / 2 + 1, children.size()));
 		if (v < m)
 			tmp.addNode(v, node);
 		else
@@ -164,18 +140,15 @@ public class BPNode implements Serializable {
 		updateParent(tmp, m);
 	}
 
-	private void updateParent(BPNode tmp, int m) {
+	public void updateParent(BPNode tmp, int m) {
 		if (parent == null) {
 			parent = new BPNode();
 			parent.value.add(m);
 			tmp.parent = this.parent;
 			parent.children.add(tmp);
 			parent.children.add(this);
-			root = parent;
+			Main.root = parent;
 			Main.count++;
-			// System.out.println("EZAFE");
-			// System.out.println();
-			// System.out.println();
 		} else {
 			tmp.parent = parent;
 			parent.addNode(m, tmp);
